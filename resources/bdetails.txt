@@ -1,673 +1,1065 @@
 beacon> help remote-exec
-Use: remote-exec [方法] [目标] [命令]
+Use: remote-exec [method] [target] [command]
 
-使用指定的 [方法] 在 [目标] 上执行 [命令]
+Run a [command] on [target] via [method].
 
-单独输入 "remote-exec" 可以查看 [方法] 列表
+Type 'remote-exec' by itself to see a list of methods.
 
 beacon> help blockdlls
 Use: blockdlls [start|stop]
 
-使用二进制签名策略启动子进程，该策略会阻止非Microsoft DLL加载到子进程中
+Launch child processes with a binary signature policy that blocks 
+non-Microsoft DLLs from loading into the child process.
 
+Use "blockdlls stop" to disable this behavior.
 
-使用 "blockdlls stop" 来禁用该策略
-
-此功能需要Windows 10 / Windows Server 2012或更高版本
+This feature requires Windows 10/Windows Server 2012 or later.
 
 beacon> help argue
-Use: argue [命令] [假参数]
-     argue [命令]
+Use: argue [command] [fake arguments]
+     argue [command]
      argue
 
-当Beacon启动 [命令] 进程时，设置其命令行参数为 [假参数]，用于欺骗EDR等软件采集到的命令行参数
-这个选项不会影响 runu/spawnu、 runas/spawnas 以及 post-ex 任务
+Spoof [fake arguments] for [command] processes launched by Beacon.
+This option does not affect runu/spawnu, runas/spawnas, or post-ex jobs.
 
-使用 "argue [命令]" 来禁用针对特定 [命令] 的参数伪装功能
+Use argue [command] to disable this feature for the specified command.
 
-单独输入 "argue" 可以列出所有定义了命令行参数伪装的程序
+Use argue by itself to list programs with defined spoofed arguments.
 
 beacon> help runasadmin
-Use: runasadmin [利用程序] [命令] [参数]
+Use: runasadmin [exploit] [command] [args]
 
-尝试以高权限（过UAC）运行指定的[命令]
+Attempt to run the specified command in an elevated context.
 
-单独输入 "runasadmin" 可以查看所有可用的本地 [利用程序]
+Type runasadmin by itself to see a list of available local exploits.
 
 beacon> help setenv
-Use: setenv [变量] [值]
+Use: setenv [key] [value]
 
-设置环境变量
+Set an environment variable.
 
 beacon> help reg
-Use: reg query  [x86|x64] [根\路径]
-     reg queryv [x86|x64] [根\路径] [子项]
+Use: reg query  [x86|x64] [root\path]
+     reg queryv [x86|x64] [root\path] [subkey]
 
-使用 "query" 查询注册表中的键，会列出所有子项和值
+Use 'query' to query a key within the registry. Lists all subkeys and values.
 
-使用 "queryv" 查询注册表中的子项，仅列出子项及其值
+Use 'queryv' to query a subkey within the registry. Lits only the subkey and 
+its value.
 
-使用 HKLM, HKCR, HKCC, HKCU 或 HKU 来指定根
+Use HKLM, HKCR, HKCC, HKCU, or HKU for the root.
 
-指定 x86|x64 来强制查看特定的注册表
+Specify x86|x64 to force a specific view of the registry.
 
 beacon> help execute-assembly
-Use: execute-assembly [/本地绝对路径/file.exe] [参数]
+Use: execute-assembly [/path/to/file.exe] [arguments]
+Use: execute-assembly "[PATCHES: [patch-rule] [patch-rule] [patch-rule] [patch-rule]]" [/path/to/file.exe] [arguments]
 
-在目标上执行本地.NET程序，此命令会在一个临时进程中加载CLR并将.NET程序加载到其中运行
+Executes a local .NET process assembly on target. This command loads the CLR in a temporary
+process and loads the assembly into it. If the assembly is in the data store, this command will
+use the loaded item automatically. For more information (help data-store).
+
+The optional "PATCHES:" argument can modify functions in memory for the process.
+Up to 4 "patch-rule" rules can be specified (space delimited).
+
+"patch-rule" syntax (comma delimited): [library],[function],[offset],[hex-patch-value]
+
+library          - 1-260 characters
+function         - 1-256 characters
+offset           - 0-65535 (The offset from the start of the executable function)
+hex-patch-value  - 2-200 hex characters (0-9,A-F). Length must be even number (hex pairs).
+
+Examples: execute-assembly "PATCHES: ntdll.dll,EtwEventWrite,0,C300" [/path/to/file.exe] [arguments]
+          execute-assembly "PATCHES: ntdll.dll,EtwEventWrite,0,C3 ntdll.dll,EtwEventWrite,1,00" [/path/to/file.exe] [arguments]
 
 beacon> help dllload
-Use: dllload [pid] [c:\目标上路径\file.dll]
+Use: dllload [pid] [c:\path\to\file.dll]
 
 Load DLL into specified remote process via LoadLibrary(). The DLL must exist on the target.
-通过 LoadLibrary() 将DLL加载到指定的远程进程中，DLL必须在目标机器上存在
 
 beacon> help getprivs
 Use: getprivs
 
-在当前访问令牌上启用尽可能多的系统特权
+Enable as many system privileges as possible on current token
 
 beacon> help kerberos_ticket_purge
 Use: kerberos_ticket_purge
 
-清除当前会话中的kerberos票据
+Purges kerberos tickets from this session
 
 beacon> help kerberos_ccache_use
-Use: kerberos_ccache_use [/本地绝对路径/file.ccache]
+Use: kerberos_ccache_use [/path/to/file.ccache]
 
-将Kerberos票据从本地ccache文件应用于当前会话
+Applies a Kerberos ticket to this session from ccache file.
 
 beacon> help kerberos_ticket_use
-Use: kerberos_ticket_use [/本地绝对路径/file.ticket]
+Use: kerberos_ticket_use [/path/to/file.ticket]
 
-将Kerberos票据从本地ticket文件应用于当前会话
+Applies a Kerberos ticket to this session
 
 beacon> help kill
-Use: kill [进程pid]
+Use: kill [process id]
 
-杀死指定的进程
+Kills the specified process
+
+beacon> help process_browser
+Use: process_browser
+
+Open the process browser tab for this beacon.
 
 beacon> help ps
 Use: ps
 
-显示进程列表
+Shows a list of processes
 
 beacon> help timestomp
-Use: timestomp [文件A] [文件B]
+Use: timestomp [fileA] [fileB]
 
-修改文件A的修改时间、访问时间和创建时间为文件B的时间
+Update the Modified, Access, and Created times of fileA to match those of fileB
 
 beacon> help getuid
 Use: getuid
 
-打印与当前访问令牌关联的用户ID
+Prints the User ID associated with the current token
 
 beacon> help rev2self
 Use: rev2self
 
-还原为原始访问令牌
+Revert to your original access token
 
 beacon> help steal_token
 Use: steal_token [pid]
+     steal_token [pid] <OpenProcessToken access mask>
 
-从进程中窃取访问令牌
+Steal an access token from a process.
+
+OpenProcessToken access mask suggested values:
+  blank = default (TOKEN_ALL_ACCESS)
+      0 = TOKEN_ALL_ACCESS
+     11 = TOKEN_ASSIGN_PRIMARY | TOKEN_DUPLICATE | TOKEN_QUERY (1+2+8)
+
+Access mask values:
+  STANDARD_RIGHTS_REQUIRED . . . . : 983040
+  TOKEN_ASSIGN_PRIMARY . . . . . . : 1
+  TOKEN_DUPLICATE  . . . . . . . . : 2
+  TOKEN_IMPERSONATE  . . . . . . . : 4
+  TOKEN_QUERY  . . . . . . . . . . : 8
+  TOKEN_QUERY_SOURCE . . . . . . . : 16
+  TOKEN_ADJUST_PRIVILEGES  . . . . : 32
+  TOKEN_ADJUST_GROUPS  . . . . . . : 64
+  TOKEN_ADJUST_DEFAULT . . . . . . : 128
+  TOKEN_ADJUST_SESSIONID . . . . . : 256
+
+For more information, see the Trust Relationships user guide section.
+
+beacon> help token-store
+
+Use: token-store steal [pid,...] <OpenProcessToken access mask>
+     token-store steal-and-use [pid] <OpenProcessToken access mask>
+     token-store use [id]
+     token-store show
+     token-store remove [id,...]
+     token-store remove-all
+
+Use 'token-store steal' to steal an access token and store it in the token store.
+
+Use 'token-store steal-and-use' to steal an access token, store it and immediately apply it to the current beacon.
+
+Use 'token-store use' to use an access token from the token store.
+
+Use 'token-store show' to print the access tokens currently available in the token store.
+
+Use 'token-store remove' to remove specific access tokens from the store.
+
+Use 'token-store remove-all' to remove all access tokens from the store
+
+OpenProcessToken access mask suggested values:
+  blank = default (TOKEN_ALL_ACCESS)
+      0 = TOKEN_ALL_ACCESS
+     11 = TOKEN_ASSIGN_PRIMARY | TOKEN_DUPLICATE | TOKEN_QUERY (1+2+8)
+
+Access mask values:
+  STANDARD_RIGHTS_REQUIRED . . . . : 983040
+  TOKEN_ASSIGN_PRIMARY . . . . . . : 1
+  TOKEN_DUPLICATE  . . . . . . . . : 2
+  TOKEN_IMPERSONATE  . . . . . . . : 4
+  TOKEN_QUERY  . . . . . . . . . . : 8
+  TOKEN_QUERY_SOURCE . . . . . . . : 16
+  TOKEN_ADJUST_PRIVILEGES  . . . . : 32
+  TOKEN_ADJUST_GROUPS  . . . . . . : 64
+  TOKEN_ADJUST_DEFAULT . . . . . . : 128
+  TOKEN_ADJUST_SESSIONID . . . . . : 256
+
+For more information, see the Trust Relationships user guide section.
 
 beacon> help getsystem
 Use: getsystem
 
-尝试获得SYSTEM权限
+Attempts to get SYSTEM
 
 beacon> help link
-Use: link [目标] [管道名]
-     link [目标]
+Use: link [target] [pipe]
+     link [target]
 
-连接SMB Beacon并建立控制通道，所有对于SMB Beacon的命令请求都将通过当前Beacon会话
-可以指定一个显式的 [管道名] 以连接到特定管道。否则，将使用当前配置文件中的默认管道名
+Connect to an SMB Beacon and re-establish control of it. All requests for 
+connected Beacon will go through this Beacon. Specify an explicit [pipe]
+to link to that pipename. The default pipe from the current profile is
+used otherwise.
+
+beacon> help unlink
+Use: unlink [ip address]
+     unlink [ip address] [pid]
+
+Disconnect from a named pipe or TCP Beacon.
+
+Specify an IP address or an IP address and session PID to disconnect a specific Beacon.
 
 beacon> help connect
-Use: connect [目标]
-     connect [目标] [端口]
+Use: connect [target]
+     connect [target] [port]
 
-连接TCP Beacon并建立控制通道。所有对于TCP Beacon的命令请求都将通过当前Beacon会话
+Connect to a TCP Beacon and re-establish control of it. All requests for 
+connected Beacon will go through this Beacon.
 
-使用 "unlink" 命令来断开TCP Beacon
+Use 'unlink' to disconnect from a TCP Beacon.
 
 beacon> help cd
-Use: cd [目录]
+Use: cd [directory]
 
-更改目标主机上的目录
+Change directory on host
 
 beacon> help checkin
 Use: checkin
 
-强制DNS Beacon回连并更新状态，Beacon会上传其主机元数据及键盘记录信息
+Forces DNS Beacon to connect to you. During a checkin Beacon posts its host
+metadata and dumps logged keystrokes.
 
 beacon> help clear
 Use: clear
 
-清空Beacon任务队列
+Clear beacon queue
 
 beacon> help download
 Use: download [file]
 
-下载一个文件，可以到 视图->下载列表 中看到下载成功的文件列表
+Download a file. Go to View -> Downloads to see it
 
 beacon> help shell
-Use: shell [命令] [参数]
+Use: shell [command] [arguments]
 
-使用cmd.exe执行命令
+Execute the command using cmd.exe
 
 beacon> help powershell
-Use: powershell [cmdlet] [参数]
+Use: powershell [commandlet] [arguments]
 
-使用powershell执行命令
-最后一次使用powershell-import导入的任何cmdlet也可以在这里使用
+Execute the command using powershell. Any cmdlets from the
+last use of powershell-import are available here too.
 
 beacon> help powershell-import
-Use: powershell-import [/本地绝对路径/script.ps1]
+Use: powershell-import [/path/to/local/script.ps1]
 
-从本地导入一个powershell脚本，后续powershell/powerpick命令可以
-调用该脚本中的cmdlet。一次只能使用一个导入脚本，再次导入会覆盖之前的脚本
+Import a powershell script which is combined with future
+calls to the powershell command. You may only use one
+imported script at a time.
 
 beacon> help execute
-Use: execute [程序] [参数]
+Use: execute [program] [arguments]
 
-执行程序，不会阻塞当前进程，也不会返回输出
+Execute the program. Does not block or return output.
 
 beacon> help run
-Use: run [程序] [参数]
+Use: run [program] [arguments]
 
-执行程序，返回程序输出
+Execute the program. Returns output.
 
 beacon> help exit
 Use: exit
 
-终止当前beacon会话
+Terminate the beacon session
 
 beacon> help help
-Use: help [命令]
+Use: help [command]
 
-显示命令帮助
+Display help for a command
 
 beacon> help inject
-Use: inject [pid] <x86|x64> [监听器]
+Use: inject [pid] <x86|x64> [listener]
 
-打开 [pid] 指定的进程并注入运行从 [监听器] 生成的shellcode
+Open the process and inject shellcode for the listener
 
 beacon> help shinject
-Use: shinject [pid] <x86|x64> [/本地绝对路径/my.bin]
+Use: shinject [pid] <x86|x64> [/path/to/my.bin]
 
-打开 [pid] 指定的进程并注入运行本地shellcode文件
+Open the process and inject shellcode into it
 
 beacon> help shspawn
-Use: shspawn <x86|x64> [/本地绝对路径/my.bin]
+Use: shspawn <x86|x64> [/path/to/my.bin]
 
-新建傀儡进程，并注入运行本地shellcode文件
+Spawn a process and inject shellcode into it.
 
 beacon> help dllinject
-Use: dllinject [pid] [/本地绝对路径/my.dll]
+Use: dllinject [pid] [/path/to/my.dll]
 
-打开 [pid] 指定的进程并注入一个反射加载的本地DLL文件
+Open the process and injects a Reflective DLL
 
 beacon> help keylogger
 Use: keylogger [pid] [x86|x64]
      keylogger
 
-将键盘记录器注入 [pid] 指定的进程
+Inject a keystroke logger into the specified process.
 
-使用不带任何参数的 [keylogger] 命令会创建一个临时傀儡过程，并将键盘记录器注入其中
+Use keylogger with no arguments to spawn a temporary process and inject the 
+keystroke logger into it.
 
-终止键盘记录：使用 [jobs] 命令查找任务ID，然后使用 [jobkill] 命令结束任务
-
-beacon> help link
-Use: link [ip地址]
-
-链接到指定IP地址的Beacon会话
-
-beacon> help unlink
-Use: unlink [ip地址]
-     unlink [ip地址] [pid]
-
-断开与SMB 命名管道或TCP Beacon的连接
-
-指定IP地址或IP地址以及会话PID来断开特定Beacon的连接
+To terminate this task: use jobs to find the job ID. Use jobkill to kill it.
 
 beacon> help message
-Use: message [消息]
+Use: message [text]
 
-给用户弹出一条消息，这是一个傻逼命令
+Display a message to the user. This is a silly command.
 
 beacon> help mode
 Use: mode [dns|dns6|dns-txt]
 
-设置Beacon的数据交换模式，仅对DNS Beacon有用
+Sets Beacon's mode to exchange data with the end-user. This only has an effect
+on a DNS beacon.
 
-dns模式
+mode dns
 --------
-使用DNS A记录请求获取任务。如果不能使用TXT记录，则使用此选项与DNS通信
-该模式将数据编码在DNS请求的hostname中进行传输
+Get tasks with DNS A record requests. Use this option to communicate with DNS 
+when TXT records are not an option. Sends data as DNS requests with data encoded
+inside of the hostname.
 
-dns6模式
+mode dns6
 ---------
-使用DNS AAAA记录请求获取任务。如果不能使用TXT记录，则使用此选项与DNS通信
-该模式将数据编码在DNS请求的hostname中进行传输
+Get tasks with DNS AAAA record requests. Use this option to communicate with DNS 
+when TXT records are not an option. Sends data as DNS requests with data encoded
+inside of the hostname.
 
-dns-txt模式
+mode dns-txt
 ------------
-使用DNS TXT记录请求获取任务。该通道每个请求携带189个字节，而DNS A记录请求
-仅为4个字节，使用与其他DNS模式相同的技术发送数据
+Get tasks with DNS TXT record requests. This channel carries 189 bytes per 
+request versus 4 bytes for a DNS A record request. Sends data with the same
+technique as the other DNS mode.
 
 beacon> help socks
-Use: socks [stop|port]
+Use: socks [stop]
+     socks [port]
+     socks [port] [socks4]
+     socks [port] [socks5]
+     socks [port] [socks5] [enableNoAuth|disableNoAuth] [user] [password]
+     socks [port] [socks5] [enableNoAuth|disableNoAuth] [user] [password] [enableLogging|disableLogging]
 
-在指定端口上启动SOCKS4a代理服务器，该服务器将通过当前Beacon中继网络连接
+Starts a SOCKS4a (default) or SOCKS5 server on the specified port.
+This server will relay connections through this Beacon.
 
-使用 "socks stop" 命令停止SOCKS4a代理服务器
+SOCKS5 servers can be configured with NoAuth authentication (default),
+User/Password authentication, and some additional logging.
 
-Beacon会话处于睡眠状态时，流量不会中继。 使用 "sleep" 命令更改睡眠时间以减少延迟
+SOCKS5 Servers currently do not support GSSAPI authentication,
+UDP Association, and IPV6.
+
+Use socks stop to stop the SOCKS servers and terminate existing connections.
+
+Traffic will not relay while Beacon is asleep. Change the sleep time with the
+sleep command to reduce latency.
 
 beacon> help sleep
-Use: sleep [时间(秒)] <抖动>
+Use: sleep [time in seconds] <jitter>
+     sleep <number of days>d <number of hours>h <number of minutes>m  <number of seconds>s <jitter>j
 
-更改Beacon回连的间隔睡眠时间。 使用 "sleep 0" 命令可强制Beacon每秒多次回连（实时交互）
+Change how often the beacon calls home. Use sleep 0 to force Beacon to call 
+home many times each second. 
 
-指定一个抖动值（0-99）可以让Beacon随机更改其睡眠时间
+Specify a jitter value (0-99) to force Beacon to randomly modify its sleep time.
+
+When setting long sleep periods it is easier to use the format that specifies
+day, minutes, hours and seconds.
+
+Example
+-------
+Set a sleep period of 2 hours and 30 minutes with jitter of 15%.
+
+This can be achieved using:
+     sleep 9000 15
+or
+     sleep 2h 30m 15j
+
+Both set the same sleep period of 9000 seconds with a jitter of 15%.
+The second option allows you to set the sleep period without the mathematics to
+convert the required period into seconds.
 
 beacon> help spawn
-Use: spawn [x86|x64] [监听器]
-     spawn [监听器]
+Use: spawn [x86|x64] [listener]
+     spawn [listener]
 
-创建一个x86或x64傀儡进程，并注入运行从 [监听器] 生成的shellcode
+Spawn an x86 or x64 process and inject shellcode for the listener.
 
 beacon> help spawnto
-Use: spawnto [x86|x64] [c:\目标上路径\whatever.exe]
+Use: spawnto [x86|x64] [c:\path\to\whatever.exe]
 
-设置Beacon创建傀儡进程时使用的可执行文件路径，必须指定完整路径
-支持使用环境变量（例如％windir％\sysnative\rundll32.exe）
+Sets the executable Beacon spawns x86 and x64 shellcode into. You must specify a
+full-path. Environment variables are OK (e.g., %windir%\sysnative\rundll32.exe)
 
-请勿直接使用 "%windir%\system32\"，该路径会根据Beacon是x86还是x64而解析成不同的绝对路径
-x64请使用 "%windir%\sysnative\"
-x86请使用 "%windir%\syswow64\"
+Do not reference %windir%\system32\ directly. This path is different depending
+on whether or not Beacon is x86 or x64. Use %windir%\sysnative\ and 
+%windir%\syswow64\ instead.
 
-当WOW64不存在时，Beacon将会把 "%windir%\syswow64\" 映射到 system32
+Beacon will map %windir%\syswow64\ to system32 when WOW64 is not present.
 
 beacon> help upload
-Use: upload [/本地绝对路径/file]
+Use: upload [/path/to/file]
 
-上传一个文件到目标机器
+Upload a file to host
 
 beacon> help runas
-Use: runas [域\用户名] [密码] [命令] [参数]
+Use: runas [DOMAIN\user] [password] [command] [arguments]
 
-尝试以另一个用户身份执行程序。如果您未指定域，则Beacon将尝试认证为本地用户
+Attempt to execute a program as another user. If you don't specify DOMAIN,
+Beacon will try to authenticate as a local user.
 
-如果当前Beacon在SYSTEM权限上下文中，此命令通常会失败
+This command will usually fail if you're in a SYSTEM context.
 
 beacon> help pwd
 Use: pwd
 
-显示Beacon的当前工作目录
+Displays the current working directory of this Beacon.
 
 beacon> help covertvpn
-Use: covertvpn [网卡] [ip地址]
+Use: covertvpn [interface] [ip address]
 
-将Covert VPN部署到目标系统，必须拥有管理员权限才能正常使用
+Deploy a Covert VPN to the target's system. You must have administrator
+privileges for the client to work. 
 
-可以通过 Cobalt Strike->VPN网卡 新建一个 [网卡]
-[ip地址] 是要将VPN客户端部署到目标机器网卡的IP地址
+Setup an [interface] through Cobalt Strike -> VPN Interfaces. The 
+[ip address] is the IP address of the target interface you want to deploy
+the VPN client to.
 
 beacon> help browserpivot
 Use: browserpivot [pid] [x86|x64]
      browserpivot [stop]
 
-安装浏览器代理到 [pid] 指定的进程。 要劫持经过身份验证的Web会话，请确保该进程是一个
-"IE浏览器"的选项卡进程。IE浏览器选项卡进程的父进程一定是iexplore.exe
+Setup a Browser Pivot into the specified process. To hijack authenticated
+web sessions, make sure the process is an Internet Explorer tab. These
+processes have iexplore.exe as their parent process.
 
-使用 "browserpivot stop" 命令终止浏览器身份代理
+Use "browserpivot stop" to tear down the browser pivoting sessions 
+associated with this Beacon.
 
 beacon> help desktop
 Use: desktop [pid] [x86|x64] [high|low]
      desktop [high|low]
 
-在目标机器上启动一个VNC服务器并连接，可以指定VNC会话的图像质量高低
+Injects a VNC server onto the target and connects to it. You may specify
+whether or not the session is high or low-quality.
 
 beacon> help jobs
 Use: jobs
 
-列出长时间运行的后台任务
+Lists long-running post-exploitation tasks. 
 
 beacon> help jobkill
 Use: jobkill [job ID]
 
-终止一个长时间运行的后台任务
+Stop a long-running post-exploitation task.
 
 beacon> help hashdump
-Use: hashdump
+Use: hashdump [pid] [x86|x64]
+     hashdump
 
-抓取密码哈希值（警告：会注入LSASS进程）
+Inject the hashdump tool into the specified process
+
+Use hashdump with no arguments to spawn a temporary process and inject the
+hashdump tool into it.
+
+The hashdump tool will dump password hashes (Warning: Injects into LSASS)
+This command requires administrator privileges.
+If injecting into a pid that process requires administrator privileges.
 
 beacon> help mimikatz
-Use: mimikatz [模块::命令] <参数>
-     mimikatz [!模块::命令] <参数>
-     mimikatz [@模块::命令] <参数>
+Use: mimikatz [pid] [arch] [module::command] <args>
+     mimikatz [pid] [arch] [!module::command] <args>
+     mimikatz [pid] [arch] [@module::command] <args>
+     mimikatz [module::command] <args>
+     mimikatz [!module::command] <args>
+     mimikatz [@module::command] <args>
 
-运行mimikatz命令
+Inject into the specified process to run a mimikatz command.
 
-用 ! 使mimikatz在运行命令之前提升到SYSTEM，有一些命令需要高权限
+Use mimikatz with no [pid] and [arch] arguments to spawn a temporary
+process to run a mimikatz command.
 
-用 @ 使mimikatz在运行命令之前模拟Beacon的线程访问令牌
-这对于需要与远程系统交互的mimikatz命令很有帮助（例如 lsadump::dcsync）
+Use ! to make mimikatz elevate to SYSTEM before it runs your command. Some
+commands require this.
+
+Use @ to make mimikatz impersonate Beacon's thread token before it runs your
+command. This is helpful for mimikatz commands that interact with remote
+systems (e.g., lsadump::dcsync)
+
+Use ; to separate multiple mimikatz commands.  The maximum length of the commands
+is 511 characters.
+Example:
+   mimikatz crypto::capi ; crypto::certificates /systemstore:local_machine /store:my /export
 
 beacon> help pth
-Use: pth [域\用户名] [NTLM哈希]
+Use: pth [pid] [arch] [DOMAIN\user] [NTLM hash]
+     pth [DOMAIN\user] [NTLM hash]
 
-使用mimikatz生成并模拟一个访问令牌，该令牌使用指定的域、用户和NTLM哈希作为单点登录凭据
-当需要与网络资源进行交互时，Beacon将传递此哈希
+Inject into the specified process to generate AND impersonate a token.
+
+Use pth with no [pid] and [arch] arguments to spawn a temporary
+process to generate AND impersonate a token.
+
+This command uses mimikatz to generate AND impersonate a token that uses the
+specified DOMAIN, user, and NTLM hash as single sign-on credentials. Beacon
+will pass this hash when you interact with network resources.
 
 beacon> help screenshot
 Use: screenshot [pid] [x86|x64]
      screenshot 
 
-将屏幕截图工具注入 [pid] 指定的进程
+Inject a screenshot tool into the specified process.
 
-使用不带参数的 [screenshot] 命令可以启动一个临时傀儡进程，并将屏幕截图工具注入其中
+Use screenshot with no arguments to spawn a temporary process and inject the 
+screenshot tool into it.
 
-屏幕截图工具会在截屏一次后退出
+Screenshot takes a picture of the visible desktop and exits.
 
 beacon> help printscreen
 Use: printscreen [pid] [x86|x64]
      printscreen 
 
-将屏幕截图工具注入 [pid] 指定的进程
+Inject a screenshot tool into the specified process.
 
-使用不带参数的 [printscreen] 命令可以启动一个临时傀儡进程，并将屏幕截图工具注入其中
+Use printscreen with no arguments to spawn a temporary process and inject the 
+screenshot tool into it.
 
-Printscreen会强制按下PrintScr按键，然后从剪贴板中抓取屏幕截图，然后退出
-截图完成后，此命令将清除剪贴板内容
+Printscreen forces a PrintScr keypress and grabs the screenshot from the
+clipboard. It then exits. This command will clear the clipboard contents after
+its done.
 
-这种截屏方法无法长期在后台运行...因为...讲道理定期操作剪切板并不是很好的OPSEC
+No long-running variant of this exists because... let's face it... nuking the
+clipboard periodically is probably not good OPSEC.
 
 beacon> help screenwatch
 Use: screenwatch [pid] <x86|x64>
      screenwatch 
 
-将屏幕监控工具注入 [pid] 指定的进程
+Inject a screen watcher tool into the specified process.
 
-使用不带任何参数的 "screenwatch" 命令可以启动一个临时傀儡进程，并将屏幕监控工具注入其中运行
+Use screenwatch with no arguments to spawn a temporary process and inject the 
+screen watch tool into it.
 
-Screenwatch会定时发送用户桌面的屏幕截图（每次Beacon回连时发送一次），直到监控工具结束
-如果用户处于空闲状态，则屏幕监控工具将每三分钟拍摄一次新的屏幕截图
+Screenwatch sends a screenshot of the user's desktop (one per Beacon check-in)
+until terminated. If the user is idle, the screen watch tool will take a new
+screenshot every three minutes.
 
-终止屏幕监控：使用 [jobs] 命令查找任务ID，然后使用 [jobkill] 命令结束任务
+To terminate this task: use jobs to find the job ID. Use jobkill to kill it.
 
 beacon> help make_token
-Use: make_token [域\用户名] [密码]
+Use: make_token [DOMAIN\user] [password]
 
-克隆当前访问令牌，并在访问网络资源时设置为指定的用户名和密码
-此命令不会验证您提供的凭据，并且对本地操作没有影响
+Clone the current access token and set it up to pass the specified username
+and password when you interact with network resources. This command does not
+validate the credentials you provide and it has no effect on local actions.
 
 beacon> help downloads
 Use: downloads
 
-列出当前正在下载的文件
+Lists file downloads currently in progress.
 
 beacon> help cancel
-Use: cancel [*文件名*]
+Use: cancel [*file*]
 
-取消当前正在进行的文件下载，文件名支持使用通配符
+Cancels a download that is currently in progress. Wildcards are OK.
 
 beacon> help rportfwd
-Use: rportfwd [绑定端口] [转发目的主机] [转发目的端口]
-     rportfwd stop [绑定端口]
+Use: rportfwd [bind port] [forward host] [forward port]
+     rportfwd stop [bind port]
 
-绑定目标主机上的指定端口。当目标主机的 [绑定端口] 被访问时，Cobalt Strike Teamserver将与
-[转发目的主机/端口] 建立连接，并使用Beacon在两个网络连接之间中继流量
+Binds the specified port on the target host. When a connection comes in,
+Cobalt Strike will make a connection to the forwarded host/port and use Beacon
+to relay traffic between the two connections.
 
 beacon> help rportfwd_local
-Use: rportfwd_local [绑定端口] [转发目的主机] [转发目的端口]
-     rportfwd_local stop [绑定端口]
+Use: rportfwd_local [bind port] [forward host] [forward port]
+     rportfwd_local stop [bind port]
 
-绑定目标主机上的指定端口。当目标主机的 [绑定端口] 被访问时，Cobalt Strike 客户端将与
-[转发目的主机/端口] 建立连接，并使用Beacon在两个网络连接之间中继流量
+Binds the specified port on the target host. When a connection comes in,
+Cobalt Strike will make a connection to the forwarded host/port, via your
+Cobalt Strike client, and use Beacon to relay traffic between the two connections.
 
 beacon> help elevate
-Use: elevate [利用程序] [监听器]
+Use: elevate [exploit] [listener]
 
-尝试使用指定的 [利用程序] 创建一个高权限Beacon会话
+Attempt to spawn an elevated session with the specified exploit.
 
-单独输入 "elevate" 可以查看所有可用的本地 [利用程序]
+Type elevate by itself to see a list of available local exploits.
 
 beacon> help jump
-Use: jump [利用程序] [目标] [监听器]
+Use: jump [exploit] [target] [listener]
 
-尝试使用指定的 [利用程序] 在远程 [目标] 上创建一个Beacon会话
+Attempt to spawn a session on a remote target with the specified exploit.
 
-单独输入 "jump" 可以查看所有可用的远程 [利用程序]
+Type jump by itself to see a list of available remote exploits.
+
+beacon> help file_browser
+Use: file_browser
+
+Open the file browser tab for this beacon. Starts in the current directory.
 
 beacon> help mkdir
-Use: mkdir [文件夹]
+Use: mkdir [folder]
 
-创建文件夹
+Make a directory
 
 beacon> help ls
-Use: ls [文件夹]
+Use: ls [folder]
 
-查看文件夹中的文件
+Lists files in a folder
 
 beacon> help rm
-Use: rm [文件夹]
+Use: rm [folder]
 
-删除一个文件或者文件夹
+Removes a file or folder
 
 beacon> help drives
 Use: drives
 
-列出当前系统上的磁盘驱动器
+Lists drives on current system
 
 beacon> help spawnas
-Use: spawnas [域\用户名] [密码] [监听器]
+Use: spawnas [DOMAIN\user] [password] [listener]
 
-尝试以另一个用户身份启动Beacon会话。如果您未指定域，则Beacon将尝试认证为本地用户
+Attempt to spawn a payload as another user. If you don't specify DOMAIN,
+Beacon will try to authenticate as a local user.
 
-如果当前Beacon在SYSTEM权限上下文中，此命令通常会失败
-可以先通过 "make_token" 命令创建访问令牌，再创建Beacon会话
+This command will usually fail if you're in a SYSTEM context. Use make_token
+to create a token to pass the desired credentials instead.
 
 beacon> help portscan
-Use: portscan [目标列表] [端口列表] [arp|icmp|none] [最大连接数]
+Use: portscan [pid] [arch] [targets] [ports] [arp|icmp|none] [max connections]
+     portscan [targets] [ports] [arp|icmp|none] [max connections]
 
-对指定的 [主机列表] 启动端口扫描
+Inject into the specified process to run a port scan against the specified hosts.
 
-[目标列表] 是要扫描的主机列表，使用逗号分隔。 也可以指定IPv4
-地址段（例如192.168.1.128-192.168.2.240，192.168.1.0/24）
+Use portscan with no [pid] and [arch] arguments to spawn a temporary
+process to run a port scan against the specified hosts.
 
-[端口列表] 是要扫描的端口列表，使用逗号分隔。 也可以指定端口范围（例如1-65535）
+[targets] is a comma separated list of hosts to scan. You may also specify
+IPv4 address ranges (e.g., 192.168.1.128-192.168.2.240, 192.168.1.0/24)
 
-[arp|icmp|none] 选项用于指示端口扫描器如何确定主机是否存活
-ARP选项使用ARP来查看系统是否响应指定的地址，ICMP选项发送ICMP回显请求
-none选项告诉端口扫描器假定所有主机均存活
+[ports] is a comma separated list or ports to scan. You may specify port
+ranges as well (e.g., 1-65535)
 
-[最大连接数] 选项可限制端口扫描器同时尝试连接的数量，端口扫描器使用异步I/O，
-能够一次处理大量连接，越高的连接数将扫的越快，默认值为1024
+The [arp|icmp|none] options dictate how the port scanning tool will determine
+if a host is alive. The ARP option uses ARP to see if a system responds to the
+specified address. The ICMP option sends an ICMP echo request. The none option 
+tells the portscan tool to assume all hosts are alive.
+
+The [max connections] option limits how many connections the port scan tool
+will attempt at any one time. The portscan tool uses asynchronous I/O and
+it's able to handle a large number of connections at one time. A higher value
+will make the portscan go much faster. The default is 1024.
 
 beacon> help net
-Use: net [命令] [参数]
+Use:net [pid] [arch] [command] [arguments]
+    net [command] [arguments]
 
-Beacon内置的主机和网络枚举探测工具。 支持的 [命令] 列表有：
+Inject the network and host enumeration tool into the specified process
 
-        命令                 描述
+Use net with no [pid] and [arch] arguments to spawn a temporary
+process and inject the network and host enumeration tool into it.
+
+Beacons's network and host enumeration tool. The built-in net commands are:
+
+        Command             Description
         -------             -----------
-        computers           列出域中的主机（通过组）
-        domain              显示该主机的域
-        dclist              列出域控制器
-        domain_controllers  列出域控制器（通过组）
-        domain_trusts       列出域信任
-        group               列出组中的成员组和成员用户
-        localgroup          列出本地组中的成员组和成员用户
-        logons              列出登录到指定主机的用户
-        sessions            列出指定主机上的会话
-        share               列出指定主机上的共享
-        user                列出用户和用户信息
-        time                显示指定主机上的时间
-        view                列出域中的主机（通过browser服务）
+        computers           lists hosts in a domain (groups)
+        dclist              lists domain controllers
+        domain              display domain for this host
+        domain_controllers  lists DCs in a domain (groups)
+        domain_trusts       lists domain trusts
+        group               lists groups and users in groups
+        localgroup          lists local groups and users in local groups
+        logons              lists users logged onto a host
+        sessions            lists sessions on a host
+        share               lists shares on a host
+        user                lists users and user information
+        time                show time for a host
+        view                lists hosts in a domain (browser service)
 
-使用 "help net [命令]" 了解更多信息
+Use "help net [command]" for more information. 
 
 beacon> help net dclist
-Use: net dclist <域>
+Use: net [pid] [arch] dclist <DOMAIN>
+     net dclist <DOMAIN>
 
-列出指定 [域] 的域控制器。 如果未指定任何域，则此命令将使用当前域
+Inject the network and host enumeration tool into the specified process
+
+Use net with no [pid] and [arch] arguments to spawn a temporary
+process and inject the network and host enumeration tool into it.
+
+Lists domain controllers for the specified domain. If no domain is specified
+this command will use the current domain. 
 
 beacon> help net domain
 Use: net domain
 
-查找此系统的活动目录域
+This command executes a BOF using inline_execute and will not spawn or inject into a process.
+
+Find active directory domain for this system
 
 beacon> help net domain_trusts
-Use: net domain_trusts <域>
+Use: net [pid] [arch] domain_trusts <DOMAIN>
+     net domain_trusts <DOMAIN>
 
-列出指定 [域] 的域信任。 如果未指定任何域，则此命令将使用当前域
+Inject the network and host enumeration tool into the specified process
+
+Use net with no [pid] and [arch] arguments to spawn a temporary
+process and inject the network and host enumeration tool into it.
+
+Lists domain trusts for the specified domain. If no domain is specified this
+command will use the current domain.
 
 beacon> help net group
-Use: net group <\\目标> <用户组>
+Use: net [pid] [arch] group <\\TARGET> <GROUPNAME>
+     net group <\\TARGET> <GROUPNAME>
 
-使用不带参数的 "net group" 命令可以枚举域控制器上的用户组
-可以使用 <\\目标> 选项指定特定的域控制器，指定 <用户组> 以获取域控制器上指定组中的用户列表
+Inject the network and host enumeration tool into the specified process
+
+Use net with no [pid] and [arch] arguments to spawn a temporary
+process and inject the network and host enumeration tool into it.
+
+Use net group by itself to enumerate groups on a domain controller. You may
+specify a specific domain controller with the target option. Specify a group
+name to get a list of users in a group on a domain controller.
 
 beacon> help net localgroup
-Use: net localgroup <\\目标> <用户组>
+Use: net [pid] [arch] localgroup <\\TARGET> <GROUPNAME>
+     net localgroup <\\TARGET> <GROUPNAME>
 
-使用不带参数的 "net localgroup" 命令可以枚举此系统上的本地用户组
-指定 <\\目标> 以枚举远程系统上的本地组，指定 <用户组> 以获取远程系统上本地用户组中的用户列表
+Inject the network and host enumeration tool into the specified process
+
+Use net with no [pid] and [arch] arguments to spawn a temporary
+process and inject the network and host enumeration tool into it.
+
+Use net localgroup by itself to enumerate local groups on this system. Specify
+a target to enumerate local groups on a remote system. Specify a group name to
+get a list of user in a local group on a target.
 
 beacon> help net logons
-Use: net logons <\\目标>
+Use: net [pid] [arch] logons <\\TARGET>
+     net logons <\\TARGET>
 
-列出登录到 [目标] 机器的用户
+Inject the network and host enumeration tool into the specified process
+
+Use net with no [pid] and [arch] arguments to spawn a temporary
+process and inject the network and host enumeration tool into it.
+
+Lists users logged onto a target.
 
 beacon> help net sessions
-Use: net sessions <\\目标>
+Use: net [pid] [arch] sessions <\\TARGET>
+     net sessions <\\TARGET>
 
-列出 [目标] 机器上的会话
+Inject the network and host enumeration tool into the specified process
+
+Use net with no [pid] and [arch] arguments to spawn a temporary
+process and inject the network and host enumeration tool into it.
+
+Lists sessions on a target
 
 beacon> help net share
-Use: net share <\\目标>
+Use: net [pid] [arch] share <\\TARGET>
+     net share <\\TARGET>
 
-列出 [目标] 机器上的共享
+Inject the network and host enumeration tool into the specified process
+
+Use net with no [pid] and [arch] arguments to spawn a temporary
+process and inject the network and host enumeration tool into it.
+
+Lists shares on a target
 
 beacon> help net time
-Use: net time <\\目标>
+Use: net [pid] [arch] time <\\TARGET>
+     net time <\\TARGET>
 
-列出 [目标] 机器上的时间
+Inject the network and host enumeration tool into the specified process
+
+Use net with no [pid] and [arch] arguments to spawn a temporary
+process and inject the network and host enumeration tool into it.
+
+Show time for the target
 
 beacon> help net user
-Use: net user <\\目标> <用户>
+Use: net [pid] [arch] user <\\TARGET> <USER>
+     net user <\\TARGET> <USER>
 
-使用不带参数的 "net user" 命令列出此系统上的用户，指定 [目标] 可列出远程系统上的用户
-指定一个 [用户] 以获取有关该用户的信息
+Inject the network and host enumeration tool into the specified process
+
+Use net with no [pid] and [arch] arguments to spawn a temporary
+process and inject the network and host enumeration tool into it.
+
+Use net user by itself to list users on this system. Specify a target to list
+users on a remote system. Specify a user to get information about a user.
 
 beacon> help net view
-Use: net view <域>
+Use: net [pid] [arch] view <DOMAIN>
+     net view <DOMAIN>
 
-使用不带参数的 "net view" 命令列出当前域上的主机。指定一个 [域] 可列出另一个域上的主机。
+Inject the network and host enumeration tool into the specified process
+
+Use net with no [pid] and [arch] arguments to spawn a temporary
+process and inject the network and host enumeration tool into it.
+
+Use net view by itself to list hosts on the current domain. Specify a domain
+to list hosts on another domain.
 
 beacon> help net computers
-Use: net computers <域.FQDN>
+Use: net [pid] [arch] computers <DOMAIN.FQDN>
+     net computers <DOMAIN.FQDN>
 
-使用不带参数的 "net computers" 命令列出指定域上Domain Computers和Domain Controllers组中的主机，
-当指定域名时需要指定域的全名（FQDN）
+Inject the network and host enumeration tool into the specified process
+
+Use net with no [pid] and [arch] arguments to spawn a temporary
+process and inject the network and host enumeration tool into it.
+
+Use net computers to list hosts from the Domain Computers and Domain Controllers
+groups on the specified domain. Please specify the DOMAIN as a fully-qualified
+domain name.
 
 beacon> help net domain_controllers
-Use: net domain_controllers <域.FQDN>
+Use: net [pid] [arch] domain_controllers <DOMAIN.FQDN>
+     net domain_controllers <DOMAIN.FQDN>
 
-使用不带参数的 "net domain_controllers" 命令列出指定域上Domain Controllers组中的主机，
-当指定域名时需要指定域的全名（FQDN）
+Inject the network and host enumeration tool into the specified process
+
+Use net with no [pid] and [arch] arguments to spawn a temporary
+process and inject the network and host enumeration tool into it.
+
+Use net domain_controllers to list hosts from the Domain Controllers group on
+the specified domain. Please specify the DOMAIN as a fully-qualified domain name.
 
 beacon> help logonpasswords
-Use: logonpasswords
+Use: logonpasswords [pid] [arch]
+     logonpasswords
 
-使用mimikatz抓取明文密码和NTLM哈希
+Inject into the specified process to dump plaintext credentials
+and NTLM hashes.
+
+Use logonpasswords with no [pid] and [arch] arguments to spawn
+a temporary process to dump plaintext credentials and NTLM hashes.
+
+This command uses mimikatz and requires administrator privileges.
 
 beacon> help note
 Use: note [text]
 
-给Beacon设置一个备注
+Assigns a note to this Beacon.
 
 beacon> help dcsync
-Use: dcsync [域.fqdn] <域\用户名>
+Use: dcsync [pid] [arch] [DOMAIN.fqdn] <DOMAIN\user>
+     dcsync [DOMAIN.fqdn] <DOMAIN\user>
 
-使用mimikatz从域控制器中提取所有域用户的NTLM哈希，指定一个用户可以仅获取其NTLM哈希
-此命令需要域管理员信任关系
+Inject into the specified process to extract the NTLM password hashes.
+
+Use dcsync with no [pid] and [arch] arguments to spawn a temporary
+process to extract the NTLM password hashes.
+
+This command uses mimikatz to extract the NTLM password hash for domain
+users from the domain controller. Specify a user to get their hash only.
+This command requires a domain administrator trust relationship.
 
 beacon> help powerpick
-Use: powerpick [cmdlet] [参数]
+Use: powerpick [commandlet] [arguments]
+     powerpick "[PATCHES: [patch-rule] [patch-rule] [patch-rule] [patch-rule]]" [commandlet] [arguments]
 
-使用非托管Powershell执行命令，不会调用powershell.exe
-最后一次使用powershell-import导入的任何cmdlet也可以在这里使用
+Execute the command using Unmanaged PowerShell. Any cmdlets from the
+last use of powershell-import are available here too.
+
+The optional "PATCHES:" argument can modify functions in memory for the process.
+Up to 4 "patch-rule" rules can be specified (space delimited).
+
+"patch-rule" syntax (comma delimited): [library],[function],[offset],[hex-patch-value]
+
+library          - 1-260 characters
+function         - 1-256 characters
+offset           - 0-65535 (The offset from the start of the executable function)
+hex-patch-value  - 2-200 hex characters (0-9,A-F). Length must be even number (hex pairs).
+
+Examples: powerpick "PATCHES: ntdll.dll,EtwEventWrite,0,C300" [commandlet] [arguments]
+          powerpick "PATCHES: ntdll.dll,EtwEventWrite,0,C3 ntdll.dll,EtwEventWrite,1,00" [commandlet] [arguments]
 
 beacon> help psinject
-Use: psinject [pid] [x86|x64] [cmdlet] [参数]
+Use: psinject [pid] [arch] [commandlet] [arguments]
 
-注入非托管Powershell到 [pid] 指定的进程中，然后执行 [cmdlect]，不会调用powershell.exe
-最后一次使用powershell-import导入的任何cmdlet也可以在这里使用
+Inject Unmanaged PowerShell into a specific process and execute the
+specified command. Any cmdlets from the last use of powershell-import are 
+available here too.
 
 beacon> help ssh
-Use: ssh [目标:端口] [用户名] [密码]
+Use: ssh [pid] [arch] [target:port] [user] [pass]
+     ssh [target:port] [user] [pass]
 
-启动SSH客户端并尝试用账号密码登录到指定目标
+Inject into the specified process to run an SSH client and attempt
+to login to the specified target.
+
+Use ssh with no [pid] and [arch] arguments to spawn a temporary
+process to run an SSH client and attempt to login to the specified target.
+
 
 beacon> help ssh-key
-Use: ssh [目标:端口] [用户名] [/本地绝对路径/key.pem]
+Use: ssh-key [pid] [arch] [target:port] [user] [/path/to/key.pem]
+     ssh-key [target:port] [user] [/path/to/key.pem]
 
-启动SSH客户端并尝试用私钥文件登录到指定目标
+Inject into the specified process to run an SSH client and attempt
+to login to the specified target.
+
+Use ssh-key with no [pid] and [arch] arguments to spawn a temporary
+process to run an SSH client and attempt to login to the specified target.
+
+The key file needs to be in the PEM format.  If the file is not in the
+PEM format then make a copy of the file and convert the copy with the
+following command:
+   /usr/bin/ssh-keygen -f [/path/to/copy] -e -m pem -p
 
 beacon> help cp
-Use: cp [源文件] [目标文件]
+Use: cp [source file] [dest file]
 
-将 [源文件] 复制到指定的 [目标文件] 位置
+Copy source file to the specified destination
 
 beacon> help mv
-Use: mv [源文件] [目标文件]
+Use: mv [source file] [dest file]
 
-将 [源文件] 移动到指定的 [目标文件] 位置
+Move source file to the specified destination
 
 beacon> help ppid
 Use: ppid [pid]
 
-使用指定的PID作为父进程启动Beacon会话。runas命令不受影响，但其他大多数命令都受影响。
+Use specified PID as parent for processes Beacon launches. The runas command
+is not affected, but most other commands are.
 
-输入不带参数的 "ppid" 命令可重置为默认行为
+Type ppid by itself to reset to default behavior.
 
-警告：不要指定父PID为另一个桌面会话中的进程。这可能会破坏Beacon的一些功能和工作流程
-如果需要以另一个桌面会话进程作为父进程运行命令，请使用runu命令
+WARNING: Do not specify a parent PID in another desktop session. This may 
+break several of Beacon's features and workflows. Use runu if you want to run 
+a command under a parent in another desktop session.
 
 beacon> help runu
-Use: runu [pid] [命令] [参数]
+Use: runu [pid] [command] [arguments]
 
-尝试以指定 [pid] 为父程序来执行 [命令]。该 [命令] 将以指定的 [pid] 进程的用户身份运行
+Attempt to execute a program with the specified PID as its parent. This program
+will run with the identity of the specified PID.
 
 beacon> help spawnu
-Use: spawnu [pid] [监听器]
+Use: spawnu [pid] [listener]
 
-尝试以指定 [pid] 为父程序来创建Beacon会话。该Beacon会话将以指定的 [pid] 进程的用户身份运行
+Attempt to spawn a session with the specified PID as its parent. This session
+will run with the identity of the specified PID.
 
 beacon> help inline-execute
-Use: inline-execute [/本地绝对路径/file.o] [参数]
+Use: inline-execute [/path/to/file.o] [args]
 
-在此Beacon会话中运行Beacon对象文件。Beacon对象文件是按Cobalt Strike文档约定编写的C语言程序，最终被编译为目标文件
+Run a Beacon Object File in this Beacon session. A Beacon Object File is a 
+C program, compiled as an object file, written to use conventions specified 
+in the Cobalt Strike documentation. If the Beacon Object File is in the data
+store, this command will use the loaded item automatically. For more
+information (help data-store).
 
 beacon> help spunnel
-Use: spunnel [x86|x64] [主机] [端口] [/本地绝对路径/agent.bin]
+Use: spunnel [x86|x64] [host] [port] [/path/to/agent.bin]
 
-这是集启动和隧道与一体的命令。将在目标上执行本地第三方agent shellcode，并创建到其控制器的反向端口转发隧道
-从Cobalt Strike Teamserver发起到 [主机:端口] 的网络连接
+This is the spawn and tunnel command. Spawn an agent and create a reverse 
+port forward tunnel to its controller.
 
 beacon> help spunnel_local
-Use: spunnel_local [x86|x64] [主机] [端口] [/本地绝对路径/agent.bin]
+Use: spunnel_local [x86|x64] [host] [port] [/path/to/agent.bin]
 
-这是集启动和隧道与一体的命令。将在目标上执行本地第三方agent shellcode，并创建到其控制器的反向端口转发隧道
-从Cobalt Strike客户端发起到 [主机:端口] 的网络连接
+This is the spawn and tunnel command. Spawn an agent and create a reverse
+port forward, tunnelled through your Cobalt Strike client, to its controller.
 
 beacon> help chromedump
-Use: chromedump
+Use: chromedump [pid] [arch]
+     chromedump
 
-使用Mimikatz从Google Chrome提取保存的账号密码和Cookies等凭证信息，该命令需要在用户权限下使用
+Inject into the specified process to recover credential material
+from Google Chrome.
+
+Use chromedump with no [pid] and [arch] arguments to spawn a temporary
+process to recover credential material from Google Chrome.
+
+This command will use Mimikatz to recover the credential material and
+should be run under a user context.
+
+beacon> help data-store
+
+Use: data-store load [bof|dotnet|file] [item path]
+     data-store load [bof|dotnet|file] [name] [item path]
+     data-store unload [index]
+     data-store list
+
+Use 'data-store load' to load post-ex items to Beacon. If the name is omitted,
+then the file name is used. The data store supports Beacon Object Files (bof)
+and .NET assemblies (dotnet). It is also possible to add arbitrary files to
+the data store (file). This provides a mechanism to upload data and then query
+it via BOFs using APIs such as BeaconStoreGetItem().
+
+Use 'data-store unload' to remove specific post-ex item from the store.
+
+Use 'data-store list' to print the post-ex items currently available in the data store.
+
+beacon> help history
+Use: history
+     history all
+     history [number]
+
+Show the command history.
+
+Use history without the [number] argument to list all the commands in the
+history.
+
+Use history without the all argument to list all the commands in the
+history.
+
+Use history with the [number] argument to only show that number of most
+recent commands.
+
+beacon> help syscall-method
+Use: syscall-method <method>
+
+Change the syscall method at runtime. Valid method types are: None, Direct, Indirect
+
+syscall-method without any arguments will query the current syscall method
+
+beacon> help !
+Use: !!
+     ![number]
+     ! [number]
+     ![string]
+     ! [string]
+     !?[string]
+     ! ?[string]
+
+Run a command from the history. The history can be viewed using the history command.
+
+"!!" runs the most recent command from the history. Equivalent to running "!-1" or "! -1".
+
+"![number]" or "! [number]" run a specific command from the history.
+   when a positive number it runs the command at that number in the history (e.g. !1 is the command at position 1 in the history)
+   when a negative number it runs the command which is that number of commands back in the history (e.g. !-1 is the last command)
+
+"![string]" or "! [string]" find the most recent command in the history that starts with the string and run it.
+
+"!?[string]" or "! ?[string]" find the most recent command in the history that contains the string and run it.
+
+beacon> help windows_error_code
+Use: windows_error_code [number]
+
+Show the Windows error code for a Windows error code number
+
+beacon> help clipboard
+Use: clipboard
+
+Attempts to get text clipboard contents
