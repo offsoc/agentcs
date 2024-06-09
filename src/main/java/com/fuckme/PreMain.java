@@ -37,12 +37,7 @@ public class PreMain {
             try {
                 if (className == null) {
                     return classfileBuffer;
-                    // } else if (className.equals("beacon/BeaconData")) {
-                    //     // 暗桩修复，修改zip包后，30分钟所有命令都会变成exit，非侵入式修改下其实不需要
-                    //     CtClass cls = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
-                    //     CtMethod mtd = cls.getDeclaredMethod("shouldPad");
-                    //     mtd.setBody("{$0.shouldPad = false;}");
-                    //     return cls.toBytecode();
+                
                 } else if (className.equals("common/Authorization")) {
                     // 设置破解key
                     CtClass cls = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
@@ -157,21 +152,6 @@ public class PreMain {
                                         classPool.get("java.lang.Object"),
                                 });
                         insertTranslateCommand(ctMethod, 2, true);
-                        // ctMethod.insertBefore("System.out.printf(\"JOptionPane.showOptionDialog2: %s\\n\", new Object[]{$2});");
-
-                        //showInputDialog 参数3是Title可被JDialog覆盖，参数2是Message，暂无正则需求
-                        // ctMethod = ctClass.getDeclaredMethod("showInputDialog",
-                        //         new CtClass[]{
-                        //                 classPool.get("java.awt.Component"),
-                        //                 classPool.get("java.lang.Object"),
-                        //                 classPool.get("java.lang.String"),
-                        //                 CtClass.intType,
-                        //                 classPool.get("javax.swing.Icon"),
-                        //                 classPool.get("java.lang.Object[]"),
-                        //                 classPool.get("java.lang.Object"),
-                        //         });
-                        // insertTranslateCommand((CtBehavior) ctMethod, 2, false);
-                        // ctMethod.insertBefore("System.out.printf(\"JOptionPane.showInputDialog: %s\\n\", new Object[]{$2});");
                         return ctClass.toBytecode();
                     }
                     // 各类文件打开窗口标题
@@ -199,57 +179,6 @@ public class PreMain {
                         // ctMethod.insertBefore("System.out.printf(\"JEditorPane.setText: %s\\n\", new Object[]{$1});");
                         return ctClass.toBytecode();
                     }
-                    // 最终会调用JLabel
-                    // if (className.equals("javax/swing/JTabbedPane")) {
-                    //     CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
-                    //     CtMethod ctMethod = ctClass.getDeclaredMethod("addTab");
-                    //     insertTranslateCommand((CtBehavior) ctMethod, 1);
-                    //     ctMethod.insertBefore("System.out.printf(\"JTabbedPane.addTab: %s\\n\", new Object[]{$1});");
-                    //     ctMethod = ctClass.getDeclaredMethod("insertTab");
-                    //     insertTranslateCommand((CtBehavior) ctMethod, 1, false);
-                    //     ctMethod.insertBefore("System.out.printf(\"JTabbedPane.insertTab: %s\\n\", new Object[]{$1});");
-                    //     return ctClass.toBytecode();
-                    // }
-                    // 只在About和System Information里面有用到
-                    // if (className.equals("javax/swing/JTextArea")) {
-                    //     CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
-                    //     CtMethod ctMethod = ctClass.getDeclaredMethod("setText");
-                    //     insertTranslateCommand((CtBehavior) ctMethod, 1, false);
-                    //     ctMethod.insertBefore("System.out.printf(\"JTextArea.setText: %s\\n\", new Object[]{$1});");
-                    //     return ctClass.toBytecode();
-                    // }
-                    // 未找到调用点
-                    // if (className.equals("java/awt/Frame") || className.equals("java/awt/Dialog")) {
-                    //     CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
-                    //     CtMethod ctMethod = ctClass.getDeclaredMethod("setTitle");
-                    //     insertTranslateCommand((CtBehavior) ctMethod, 1, false);
-                    //     ctMethod.insertBefore("System.out.printf(\"Frame|Dialog.setTitle: %s\\n\", new Object[]{$1});");
-                    //     return ctClass.toBytecode();
-                    // }
-                    // 未找到调用点
-                    // if (className.equals("javax/swing/text/JTextComponent)")) {
-                    //     CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
-                    //     CtMethod ctMethod = ctClass.getDeclaredMethod("setText");
-                    //     insertTranslateCommand((CtBehavior) ctMethod, 1, false);
-                    //     ctMethod.insertBefore("System.out.printf(\"JTextComponent.setText: %s\\n\", new Object[]{$1});");
-                    //     return ctClass.toBytecode();
-                    // }
-                    // 未找到调用点
-                    // if (className.equals("javax/swing/JComboBox")) {
-                    //     CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
-                    //     CtMethod ctMethod = ctClass.getDeclaredMethod("addItem");
-                    //     insertTranslateCommand((CtBehavior) ctMethod, 1, false);
-                    //     ctMethod.insertBefore("System.out.printf(\"JComboBox.addItem: %s\\n\", new Object[]{$1});");
-                    //     return ctClass.toBytecode();
-                    // }
-                    // Console交互窗口中的文字信息
-                    // if (className.equals("javax/swing/text/AbstractDocument")) {
-                    //     CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
-                    //     CtMethod ctMethod = ctClass.getDeclaredMethod("insertString");
-                    //     insertTranslateCommand((CtBehavior) ctMethod, 2, false);
-                    //     ctMethod.insertBefore("System.out.printf(\"AbstractDocument.insertString: %s\\n\", new Object[]{$2});");
-                    //     return ctClass.toBytecode();
-                    // }
                 }
             } catch (Exception ex) {
                 System.out.printf("[CSAgent] PreMain transform fucked up: %s\n", ex);
